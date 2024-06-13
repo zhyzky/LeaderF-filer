@@ -42,6 +42,8 @@ If you use `remove_trash` and `remove_trash_force`, you need [Send2Trash](https:
 
 ## Mappings
 
+Note: The keymap has been modified for personal usage
+
 ### Insert mode
 
 
