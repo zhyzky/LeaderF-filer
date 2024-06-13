@@ -20,9 +20,9 @@ function! leaderf#Filer#NormalMap() abort
     let l:default_map = {}
     if get(g:, 'Lf_FilerUseDefaultNormalMap', v:true)
         let l:default_map = {
-        \   'h':             'open_parent',
+        \   'u':             'open_parent',
         \   'l':             'open_current',
-        \   '<C-h>':         'open_parent',
+        \   '<C-u>':         'open_parent',
         \   '<C-l>':         'open_current',
         \   '<C-g>':         'goto_root_marker_dir',
         \   'I':             'toggle_hidden_files',
@@ -35,26 +35,27 @@ function! leaderf#Filer#NormalMap() abort
         \   'p':             'preview',
         \   'q':             'quit',
         \   'o':             'accept',
-        \   '<CR>':          'accept',
-        \   '<2-LeftMouse>': 'accept',
+        \   '<CR>':          'open_current',
+        \   '<2-LeftMouse>': 'open_current',
         \   'x':             'accept_horizontal',
         \   'v':             'accept_vertical',
         \   't':             'accept_tab',
         \   '<C-Up>':        'page_up_in_preview',
         \   '<C-Down>':      'page_down_in_preview',
-        \   '<Esc>':         'close_preview_popup',
+        \   '<Esc>':         'quit',
         \   's':             'add_selections',
         \   'a':             'select_all',
         \   'c':             'clear_selections',
-        \   'K':             'mkdir',
+        \   'N':             'mkdir',
         \   'C':             'copy',
         \   'P':             'paste',
         \   'R':             'rename',
-        \   'O':             'create_file',
+        \   'n':             'create_file',
         \   '@':             'change_directory',
         \   'H':             'history_backward',
         \   'L':             'history_forward',
         \}
+        " \   '<Esc>':         'close_preview_popup',
         " \   '<PageUp>':      'page_up',
         " \   '<PageDown>':    'page_down',
         " \   '<LeftMouse>':   'left_mouse',
@@ -85,20 +86,20 @@ function! leaderf#Filer#InsertMap() abort
     let l:default_map = {}
     if get(g:, 'Lf_FilerUseDefaultInsertMap', v:true)
         let l:default_map = {
-        \   '<C-h>':        'open_parent_or_clear_line',
+        \   '<C-u>':        'open_parent_or_clear_line',
         \   '<C-l>':        'open_current',
         \   '<C-f>':        'toggle_hidden_files',
         \   '<C-g>':        'goto_root_marker_dir',
         \   '<Esc>':        'quit',
         \   '<C-c>':        'quit',
-        \   '<CR>':         'accept',
-        \   '<2-LeftMouse>': 'accept',
+        \   '<CR>':         'open_current',
+        \   '<2-LeftMouse>': 'open_current',
         \   '<C-x>':        'accept_horizontal',
         \   '<C-]>':        'accept_vertical',
         \   '<C-t>':        'accept_tab',
         \   '<C-r>':        'toggle_regex',
         \   '<BS>':         'backspace',
-        \   '<C-u>':        'clear_line',
+        \   '<C-d>':        'clear_line',
         \   '<C-w>':        'delete_left_word',
         \   '<Del>':        'delete',
         \   '<C-v>':        'paste',
@@ -197,23 +198,23 @@ function! leaderf#Filer#NormalModeFilter(winid, key) abort
         exec g:Lf_py "filerExplManager._cli._buildPopupPrompt()"
         "redraw
         exec g:Lf_py "filerExplManager._getInstance().refreshPopupStatusline()"
-        exec g:Lf_py "gtagsExplManager._previewResult(False)"
+        exec g:Lf_py "filerExplManager._previewResult(False)"
     elseif l:cmd ==? "up"
         call win_execute(a:winid, "norm! k")
         exec g:Lf_py "filerExplManager._cli._buildPopupPrompt()"
         "redraw
         exec g:Lf_py "filerExplManager._getInstance().refreshPopupStatusline()"
-        exec g:Lf_py "gtagsExplManager._previewResult(False)"
+        exec g:Lf_py "filerExplManager._previewResult(False)"
     elseif l:cmd ==? "page_up"
         call win_execute(a:winid, "norm! \<PageUp>")
         exec g:Lf_py "filerExplManager._cli._buildPopupPrompt()"
         exec g:Lf_py "filerExplManager._getInstance().refreshPopupStatusline()"
-        exec g:Lf_py "gtagsExplManager._previewResult(False)"
+        exec g:Lf_py "filerExplManager._previewResult(False)"
     elseif l:cmd ==? "page_down"
         call win_execute(a:winid, "norm! \<PageDown>")
         exec g:Lf_py "filerExplManager._cli._buildPopupPrompt()"
         exec g:Lf_py "filerExplManager._getInstance().refreshPopupStatusline()"
-        exec g:Lf_py "gtagsExplManager._previewResult(False)"
+        exec g:Lf_py "filerExplManager._previewResult(False)"
     elseif l:key ==# "g"
         if get(g:, "Lf_Filer_is_g_pressed", 0) == 0
             let g:Lf_Filer_is_g_pressed = 1
@@ -241,7 +242,7 @@ function! leaderf#Filer#NormalModeFilter(winid, key) abort
             call win_execute(a:winid, "exec 'norm!'.v:mouse_col.'|'")
             exec g:Lf_py "filerExplManager._cli._buildPopupPrompt()"
             redraw
-            exec g:Lf_py "gtagsExplManager._previewResult(False)"
+            exec g:Lf_py "filerExplManager._previewResult(False)"
         endif
     elseif l:key ==? "<ScrollWheelUp>"
         call win_execute(a:winid, "norm! 3k")

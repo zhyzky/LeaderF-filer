@@ -114,6 +114,9 @@ class FilerExplorer(Explorer):
 # FilerExplManager
 # *****************************************************
 class FilerExplManager(Manager):
+    _scratch = "_scratch"
+    _scratch_id = -1
+
     def __init__(self):
         super(FilerExplManager, self).__init__()
         self._update_insert_maps()
@@ -121,6 +124,8 @@ class FilerExplManager(Manager):
         self._copy_mode = False
         self._command = Cmd(self)
         self._history = History()
+        self._scratch = "_scratch"
+        self._scratch_id = -1
 
     def _update_insert_maps(self):
         insert_map = lfEval("leaderf#Filer#InsertMap()")
@@ -369,6 +374,7 @@ class FilerExplManager(Manager):
                     else:
                         lnum += 1
                     self._move_cursor(lnum)
+                    self._previewInPopup(self._getInstance().buffer[lnum-1], self._getInstance().buffer, lnum)
                     break
 
     def _refresh(self, cwd=None, write_history=True, normal_mode=False):
@@ -410,15 +416,54 @@ class FilerExplManager(Manager):
             return
 
         line = args[0]
-        if line == "." or line[-1] == "/":
+        if line == NO_CONTENT_MSG:
+            self._closePreviewPopup()
             return
-
         file = self._getDigest(line, 0)
         file = os.path.join(self._getInstance().getCwd(), lfDecode(file))
         file = os.path.normpath(lfEncode(file))
-        buf_number = int(lfEval("bufadd('%s')" % escQuote(file)))
-        lfCmd("echomsg '{}'".format(file))
-        self._createPopupPreview(file, buf_number, 0)
+        if line == "." or line[-1] == "/":
+            content = []
+            try:
+                for f in sorted(os.scandir(file), key=lambda x: (not x.is_dir(), x.name)):
+                    if f.is_dir():
+                        content.append(f.name + '/')
+                    else:
+                        content.append(f.name)
+            except:
+                content.append('Permission denied!')
+            source = int(lfEval("bufadd('%s')" % self._scratch))
+            self._scratch_id = source
+            lfEval("bufload(%d)" % source)
+            lfEval("deletebufline(%d, 1, '$')" % source)
+            lfEval("setbufline(%d, 1, %s)" % (source, content))
+            #  self._closePreviewPopup()
+            #  lfCmd("echomsg '{}/{}'".format(self._getInstance().getCwd(), line))
+            #  return
+        else:
+            file_sz = os.stat(file).st_size
+            if file_sz <= 20*1024*1024:
+                source = int(lfEval("bufadd('%s')" % escQuote(file)))
+                if source != 1:
+                    source = file
+            else:
+                source = int(lfEval("bufadd('%s')" % self._scratch))
+                self._scratch_id = source
+                lfEval("bufload(%d)" % source)
+                lfEval("deletebufline(%d, 1, '$')" % source)
+                lfEval("setbufline(%d, 1, ['File Too Large!'])" % source)
+        lfCmd("echomsg '{}/{}'".format(self._getInstance().getCwd(), line))
+        self._createPopupPreview(file, source, 0)
+
+        #  buf_number = int(lfEval("bufadd('%s')" % escQuote(file)))
+        #  lfCmd("echomsg '{}'".format(file))
+        #  self._createPopupPreview(file, buf_number, 0)
+
+    def _closePreviewPopup(self):
+        if self._scratch_id != -1:
+            lfCmd("bdelete! %d" % self._scratch_id)
+            self._scratch_id = -1
+        super()._closePreviewPopup()
 
     def _redrawStlCwd(self, cwd=None):
         if cwd is None:

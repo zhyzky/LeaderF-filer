@@ -32,6 +32,7 @@ def command__open_current(manager):
         manager._gotoFirstLine()
 
     manager._chcwd(os.path.abspath(file_info["fullpath"]))
+    manager._previewInPopup(manager._getInstance().buffer[0], manager._getInstance().buffer, 1)
     manager._history.add(manager._getExplorer().cwd)
 
 

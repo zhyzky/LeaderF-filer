@@ -4,6 +4,8 @@ This Plugin use [LeaderF](https://github.com/Yggdroot/LeaderF) to navigate the f
 
 Inspired by [vim-clap's filer provider](https://github.com/liuchengxu/vim-clap/pull/272), [helm's find-files](https://github.com/emacs-helm/helm).
 
+This Plugin can preview fold content. And if the file size is too large (>20M), the preview function won't work for the speed.
+
 <p align="center">
   <img src="https://github.com/tamago324/images/blob/master/leaderf_filer/leaderf-filer.gif" alt="leaderf-filer-gif" width="700" style=""/>
 </p>
