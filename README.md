@@ -64,7 +64,7 @@ Note: The keymap has been modified for personal usage
 | `<C-Up>`                    | page_up_in_preview        | Scroll up in the popup preview window.                                                                  |
 | `<C-Down>`                  | page_down_in_preview      | Scroll down in the popup preview window.                                                                |
 |                             | close_preview_popup       | Close popup preview window.                                                                             |
-|                             | open_parent               | The prompt string is cleared and show files files in the parent directory.                              |
+| `<C-u>`                     | open_parent               | The prompt string is cleared and show files files in the parent directory.                              |
 | `<C-l>`                     | open_current              | Show files in directory under cursor or open the file under the cursor.                                 |
 | `<C-f>`                     | toggle_hidden_files       | Toggle show hidden files.                                                                               |
 | `<C-g>`                     | goto_root_marker_dir      | Show files of directory where `g:Lf_RootMarkers` exists.                                                |
@@ -75,7 +75,7 @@ Note: The keymap has been modified for personal usage
 |                             | open_parent_or_backspace  | Show files in parent directory or delete the preceding character in the prompt if a pattern wasentered. |
 | `<C-h>`                     | open_parent_or_clear_line | Show files in parent directory or clears the prompt if a pattern was entered.                           |
 | `<C-v>` <br> `<S-Insert>`   | paste                     | Paste from clipboard.                                                                                   |
-| `<C-u>`                     | clear_line                | Clear the prompt.                                                                                       |
+| `<C-d>`                     | clear_line                | Clear the prompt.                                                                                       |
 | `<C-w>`                     | delete_left_word          | Delete the word before the cursor in the prompt.                                                        |
 | `<Up>`                      | prev_history              | Recall last input pattern from history.                                                                 |
 | `<Down>`                    | next_history              | Recall next input pattern from history.                                                                 |
@@ -100,6 +100,7 @@ You can view help in F1.
 | `o` <br> `<CR>` <br> `<2-LeftMouse>` | accept               | Open the file under cursor or create a file with the input pattern file name (when empty results). |
 | `x`                                  | accept_horizontal    | Open the file under cursor in horizontal split window.                                             |
 | `v`                                  | accept_vertical      | Open the file under cursor in vertical split window.                                               |
+| `u`                                  | open_parent          | The prompt string is cleared and show files files in the parent directory.                         |
 | `t`                                  | accept_tab           | Open the file under cursor new tabpage.                                                            |
 | `s`                                  | add_selections       | select multiple result.                                                                            |
 | `a`                                  | select_all           | select all result.                                                                                 |

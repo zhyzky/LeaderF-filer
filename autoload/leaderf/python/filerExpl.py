@@ -65,15 +65,15 @@ class FilerExplorer(Explorer):
         if self._show_devicons:
             self._prefix_length = webDevIconsStrLen()
             # Remove icon
-            func = lambda x: x[self._prefix_length :]
+            func = lambda x: x[self._prefix_length :].upper()
         else:
             self._prefix_length = 0
-            func = lambda x: x
+            func = lambda x: x.upper()
         # Sort directories and files by each
         files = sorted(
             [k for k, v in self._contents.items() if not v["isdir"]], key=func
         )
-        dirs = sorted([k for k, v in self._contents.items() if v["isdir"]])
+        dirs = sorted([k for k, v in self._contents.items() if v["isdir"]], key=func)
 
         if lfEval("get(g:, 'Lf_FilerShowCurrentDirDot', 0)") == "1":
             # . => current directory
@@ -425,7 +425,7 @@ class FilerExplManager(Manager):
         if line == "." or line[-1] == "/":
             content = []
             try:
-                for f in sorted(os.scandir(file), key=lambda x: (not x.is_dir(), x.name)):
+                for f in sorted(os.scandir(file), key=lambda x: (not x.is_dir(), x.name.upper())):
                     if f.is_dir():
                         content.append(f.name + '/')
                     else:
