@@ -441,23 +441,58 @@ class FilerExplManager(Manager):
             #  lfCmd("echomsg '{}/{}'".format(self._getInstance().getCwd(), line))
             #  return
         else:
-            file_sz = os.stat(file).st_size
-            if file_sz <= 20*1024*1024:
-                source = int(lfEval("bufadd('%s')" % escQuote(file)))
-                if source != 1:
-                    source = file
-            else:
-                source = int(lfEval("bufadd('%s')" % self._scratch))
-                self._scratch_id = source
-                lfEval("bufload(%d)" % source)
-                lfEval("deletebufline(%d, 1, '$')" % source)
-                lfEval("setbufline(%d, 1, ['File Too Large!'])" % source)
+            source = int(lfEval("bufnr('%s')" % escQuote(file)))
+            if source == -1:
+                source = file
+        #  lfCmd("echomsg bufname()':{}'".format(source))
         lfCmd("echomsg '{}/{}'".format(self._getInstance().getCwd(), line))
         self._createPopupPreview(file, source, 0)
 
         #  buf_number = int(lfEval("bufadd('%s')" % escQuote(file)))
         #  lfCmd("echomsg '{}'".format(file))
         #  self._createPopupPreview(file, buf_number, 0)
+
+    def _useExistingWindow(self, title, source, line_num, jump_cmd):
+        if isinstance(source, str):
+            super()._useExistingWindow(title, source, line_num, jump_cmd)
+        else:
+            preview_pos = self._arguments.get("--preview-position", [""])[0]
+            if preview_pos == "":
+                preview_pos = lfEval("get(g:, 'Lf_PreviewPosition', 'top')")
+
+            if preview_pos == "cursor" and self._getInstance().getWinPos() not in ('popup', 'floatwin'):
+                show_borders = lfEval("get(g:, 'Lf_PopupShowBorder', 1)") == '1'
+                self._updateOptions(preview_pos, show_borders, self._preview_config)
+                if lfEval("has('nvim')") == '1':
+                    if 'noautocmd' in self._preview_config:
+                        del self._preview_config['noautocmd']
+                    lfCmd("call nvim_win_set_config(%d, %s)" % (self._preview_winid, str(self._preview_config)))
+                else:
+                    lfCmd("call popup_setoptions(%d, %s)" % (self._preview_winid, str(self._preview_config)))
+
+            if lfEval("has('nvim')") == '1':
+                lfCmd("noautocmd call nvim_win_set_buf(%d, %d)" % (self._preview_winid, source))
+                self._setWinOptions(self._preview_winid)
+                self._preview_filetype = ''
+            else:
+                lfCmd("noautocmd call popup_settext(%d, getbufline(%d, 1, 4096))" % (self._preview_winid, source) )
+                filename = vim.buffers[source].name
+
+                cur_filetype = getExtension(filename)
+                if cur_filetype != self._preview_filetype:
+                    lfCmd("call win_execute(%d, 'silent! doautocmd filetypedetect BufNewFile %s')" % (self._preview_winid, escQuote(filename)))
+                    self._preview_filetype = lfEval("getbufvar(winbufnr(%d), '&ft')" % self._preview_winid)
+
+                self._setWinOptions(self._preview_winid)
+
+            if jump_cmd:
+                lfCmd("""call win_execute(%d, '%s')""" % (self._preview_winid, escQuote(jump_cmd)))
+                lfCmd("call win_execute(%d, 'norm! zz')" % self._preview_winid)
+            elif line_num > 0:
+                lfCmd("""call win_execute(%d, "call cursor(%d, 1)")""" % (self._preview_winid, line_num))
+                lfCmd("call win_execute(%d, 'norm! zz')" % self._preview_winid)
+            else:
+                lfCmd("call win_execute(%d, 'norm! gg')" % self._preview_winid)
 
     def _closePreviewPopup(self):
         if self._scratch_id != -1:
