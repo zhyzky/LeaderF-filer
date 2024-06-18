@@ -423,6 +423,7 @@ class FilerExplManager(Manager):
         file = self._getDigest(line, 0)
         file = os.path.join(self._getInstance().getCwd(), lfDecode(file))
         file = os.path.normpath(lfEncode(file))
+        special_hl = ""
         if line == "." or line[-1] == "/":
             content = []
             try:
@@ -433,17 +434,11 @@ class FilerExplManager(Manager):
                         content.append(f.name)
 
                 if not content:
+                    special_hl = NO_CONTENT_MSG
                     content.append(NO_CONTENT_MSG)
-                    lfCmd(
-                        """call win_execute(%d, 'let matchid = matchadd(''Lf_hl_filerNoContent'', ''^%s$'')')"""
-                        % (self._preview_winid, NO_CONTENT_MSG))
-                else:
-                    lfCmd("""call win_execute(%d, 'call clearmatches()')""" % self._preview_winid)
             except:
                 content.append('Permission denied!')
-                lfCmd(
-                    """call win_execute(%d, 'let matchid = matchadd(''Lf_hl_filerNoContent'', ''^Permission denied!$'')')"""
-                    % self._preview_winid)
+                special_hl = "Permission denied!" 
             source = int(lfEval("bufadd('%s')" % self._scratch))
             self._scratch_id = source
             lfCmd("b%d" % source)
@@ -456,13 +451,18 @@ class FilerExplManager(Manager):
             #  lfCmd("echomsg '{}/{}'".format(self._getInstance().getCwd(), line))
             #  return
         else:
-            lfCmd("""call win_execute(%d, 'call clearmatches()')""" % self._preview_winid)
             source = int(lfEval("bufnr('%s')" % escQuote(file)))
             if source == -1:
                 source = file
         #  lfCmd("echomsg bufname()':{}'".format(source))
         lfCmd("echomsg '{}/{}'".format(self._getInstance().getCwd(), line))
         self._createPopupPreview(file, source, 0)
+        if special_hl:
+            lfCmd(
+                """call win_execute(%d, 'let matchid = matchadd(''Lf_hl_filerNoContent'', ''^%s$'')')"""
+                % (self._preview_winid, special_hl))
+        else:
+            lfCmd("""call win_execute(%d, 'call clearmatches()')""" % self._preview_winid)
 
         #  buf_number = int(lfEval("bufadd('%s')" % escQuote(file)))
         #  lfCmd("echomsg '{}'".format(file))
