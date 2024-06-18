@@ -436,7 +436,7 @@ class FilerExplManager(Manager):
             source = int(lfEval("bufadd('%s')" % self._scratch))
             self._scratch_id = source
             lfCmd("b%d" % source)
-            lfCmd("%delete")
+            lfCmd("%delete_")
             lfCmd("b#")
             #  lfEval("bufload(%d)" % source)
             #  lfEval("deletebufline(%d, 1, '$')" % source)
