@@ -431,8 +431,19 @@ class FilerExplManager(Manager):
                         content.append(f.name + '/')
                     else:
                         content.append(f.name)
+
+                if not content:
+                    content.append(NO_CONTENT_MSG)
+                    lfCmd(
+                        """call win_execute(%d, 'let matchid = matchadd(''Lf_hl_filerNoContent'', ''^%s$'')')"""
+                        % (self._preview_winid, NO_CONTENT_MSG))
+                else:
+                    lfCmd("""call win_execute(%d, 'call clearmatches()')""" % self._preview_winid)
             except:
                 content.append('Permission denied!')
+                lfCmd(
+                    """call win_execute(%d, 'let matchid = matchadd(''Lf_hl_filerNoContent'', ''^Permission denied!$'')')"""
+                    % self._preview_winid)
             source = int(lfEval("bufadd('%s')" % self._scratch))
             self._scratch_id = source
             lfCmd("b%d" % source)
@@ -445,6 +456,7 @@ class FilerExplManager(Manager):
             #  lfCmd("echomsg '{}/{}'".format(self._getInstance().getCwd(), line))
             #  return
         else:
+            lfCmd("""call win_execute(%d, 'call clearmatches()')""" % self._preview_winid)
             source = int(lfEval("bufnr('%s')" % escQuote(file)))
             if source == -1:
                 source = file
