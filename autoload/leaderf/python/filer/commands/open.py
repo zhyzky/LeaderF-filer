@@ -15,7 +15,8 @@ def command__open_current(manager):
     if line == NO_CONTENT_MSG:
         return
     if line == "":
-        return
+        manager.accept()
+        return True
 
     file_info = manager._getExplorer()._contents[line]
     if not file_info["isdir"]:

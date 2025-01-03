@@ -441,11 +441,11 @@ class FilerExplManager(Manager):
                 special_hl = "Permission denied!" 
             source = int(lfEval("bufadd('%s')" % self._scratch))
             self._scratch_id = source
-            lfCmd("b%d" % source)
-            lfCmd("%delete_")
-            lfCmd("b#")
-            #  lfEval("bufload(%d)" % source)
-            #  lfEval("deletebufline(%d, 1, '$')" % source)
+            #  lfCmd("b%d" % source)
+            #  lfCmd("%delete_")
+            #  lfCmd("b#")
+            lfEval("bufload(%d)" % source)
+            lfEval("deletebufline(%d, 1, '$')" % source)
             lfEval("setbufline(%d, 1, %s)" % (source, content))
             #  self._closePreviewPopup()
             #  lfCmd("echomsg '{}/{}'".format(self._getInstance().getCwd(), line))
