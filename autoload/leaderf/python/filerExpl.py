@@ -114,8 +114,8 @@ class FilerExplorer(Explorer):
 # FilerExplManager
 # *****************************************************
 class FilerExplManager(Manager):
-    _scratch = "_scratch"
-    _scratch_id = -1
+    #  _scratch = "_scratch"
+    #  _scratch_id = -1
 
     def __init__(self):
         super(FilerExplManager, self).__init__()
@@ -439,8 +439,10 @@ class FilerExplManager(Manager):
             except:
                 content.append('Permission denied!')
                 special_hl = "Permission denied!" 
-            source = int(lfEval("bufadd('%s')" % self._scratch))
-            self._scratch_id = source
+            if self._scratch_id == -1:
+                self._scratch_id = int(lfEval("bufadd('%s')" % self._scratch))
+                lfEval("setbufvar(%d, \"&bt\", \"nofile\")" % self._scratch_id)
+            source = self._scratch_id
             #  lfCmd("b%d" % source)
             #  lfCmd("%delete_")
             #  lfCmd("b#")
@@ -468,11 +470,11 @@ class FilerExplManager(Manager):
         #  lfCmd("echomsg '{}'".format(file))
         #  self._createPopupPreview(file, buf_number, 0)
 
-    def _closePreviewPopup(self):
-        if self._scratch_id != -1:
-            lfCmd("bdelete! %d" % self._scratch_id)
-            self._scratch_id = -1
-        super()._closePreviewPopup()
+    #  def _closePreviewPopup(self):
+    #      if self._scratch_id != -1:
+    #          lfCmd("bdelete! %d" % self._scratch_id)
+    #          self._scratch_id = -1
+    #      super()._closePreviewPopup()
 
     def _redrawStlCwd(self, cwd=None):
         if cwd is None:
